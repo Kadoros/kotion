@@ -1,4 +1,18 @@
 // types.ts
+export enum UserRole {
+  USER = "user",
+  MANAGER = "manager",
+  ADMIN = "admin", // Add this to match the enum-based structure
+}
+
+export type UserData = {
+  id: string;
+  avatar: string;
+  role: UserRole;
+  email: string;
+  lastSignedInTime:string;
+  
+};
 
 export interface Definition {
   definition: string;
