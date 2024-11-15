@@ -76,8 +76,8 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "PDF Viewer",
+          url: "/pdf",
         },
         {
           title: "Starred",
