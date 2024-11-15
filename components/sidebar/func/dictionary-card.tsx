@@ -11,7 +11,7 @@ import type {
 } from "@/types/index";
 import { cn } from "@/lib/utils";
 
-const DictionaryCard: React.FC<DictionaryCardProps> = ({
+const DictionaryCard: React.FC<DictionaryCardProps> = ({ 
   text,
   className,
 }) => {

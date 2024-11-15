@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 // Initialize the Gemini API (ensure to import the correct API)
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { DictionaryCardProps, TranslatorCardProps } from "@/types";
 
 // Initialize API client
 const genAI = new GoogleGenerativeAI("AIzaSyBTESkh_gID_pPLLU2mXw_d4Tsg87C8T1Q");  // Assuming the API Key is stored in .env.local
@@ -40,7 +41,7 @@ const model = genAI.getGenerativeModel({
   },
 });
 
-const TranslatorCard: React.FC<{ text: string; className?: string }> = ({ text, className }) => {
+const TranslatorCard: React.FC<TranslatorCardProps> = ({ text, className }) => {
   const [translation, setTranslation] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
