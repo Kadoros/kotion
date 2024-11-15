@@ -1,0 +1,88 @@
+"use client";
+
+import * as React from "react";
+import {
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  Map,
+  PieChart,
+  Plus,
+  PlusCircle,
+  Search,
+  Settings,
+  Settings2,
+  SquareTerminal,
+  Trash,
+} from "lucide-react";
+
+import { NavMain } from "@/components/sidebar/nav-main";
+import { NavProjects } from "@/components/sidebar/nav-projects";
+import { NavUser } from "@/components/sidebar/nav-user";
+import { TeamSwitcher } from "@/components/sidebar/team-switcher";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarProvider,
+  SidebarRail,
+} from "@/components/ui/sidebarL";
+import DocumentList from "@/components/sidebar/document-list";
+import { NavDocumentList } from "@/components/sidebar/nav-document-list";
+import Item from "@/components/sidebar/item";
+import { useSearch } from "@/hook/use-search";
+import { useSettings } from "@/hook/use-settings";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import TrashBox from "@/app/(main)/_components/trash-box";
+import { useMediaQuery } from "usehooks-ts";
+import { FuncSwitcher } from "./func-switcher";
+
+import { usePDFHighlight } from "@/hook/use-pdf-highlight";
+import DictionaryCard from "./func/dictionary-card";
+import TranslatorCard from "./func/translator-card";
+
+// This is sample data.
+const data = {
+  funcs: [
+    {
+      name: "Langauge support",
+      logo: GalleryVerticalEnd,
+    },
+    {
+      name: "AI chat",
+      logo: AudioWaveform,
+    },
+    {
+      name: "Evil Corp.",
+      logo: Command,
+    },
+  ],
+};
+export function FuncSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const selectedText = usePDFHighlight((state) => state.selectedText);
+  return (
+    <SidebarProvider defaultOpen={false}>
+      <Sidebar collapsible="icon" {...props}>
+        <SidebarHeader>
+          <FuncSwitcher funcs={data.funcs} />
+        </SidebarHeader>
+        <SidebarContent>
+          <DictionaryCard text={selectedText} />
+          <TranslatorCard text={selectedText} />
+        </SidebarContent>
+        <SidebarFooter></SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+    </SidebarProvider>
+  );
+}
