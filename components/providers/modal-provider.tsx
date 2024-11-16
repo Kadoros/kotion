@@ -4,6 +4,7 @@ import { SettingsModal } from "@/components/modals/settings-model";
 
 import React, { useEffect, useState } from "react";
 import { CoverImageModal } from "@/components/modals/cover-image-modal";
+import { VoiceNoteModel } from "../modals/voice-note-model";
 
 export const ModelProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -20,6 +21,7 @@ export const ModelProvider = () => {
     <>
       <SettingsModal />
       <CoverImageModal />
+      <VoiceNoteModel />
     </>
   );
 };

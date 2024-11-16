@@ -48,37 +48,51 @@ import { FuncSwitcher } from "./func-switcher";
 import { usePDFHighlight } from "@/hook/use-pdf-highlight";
 import DictionaryCard from "./func/dictionary-card";
 import TranslatorCard from "./func/translator-card";
+import LectureNotetaker from "./func/lecture-note-taker";
 
 // This is sample data.
 const data = {
   funcs: [
     {
+      id: 1,
       name: "Langauge support",
       logo: GalleryVerticalEnd,
     },
-    {
-      name: "AI chat",
-      logo: AudioWaveform,
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-    },
+    { id: 2, name: "AI chat", logo: AudioWaveform },
+    { id: 3, name: "lecture support", logo: Command },
   ],
 };
 export function FuncSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const selectedText = usePDFHighlight((state) => state.selectedText);
+  const [funcId, setFuncId] = React.useState(1);
+
+  const handleFuncChange = (id: number) => {
+    setFuncId(id);
+  };
   return (
     <SidebarProvider defaultOpen={false}>
       <Sidebar collapsible="icon" {...props}>
         <SidebarHeader>
-          <FuncSwitcher funcs={data.funcs} />
+          <FuncSwitcher funcs={data.funcs} onFuncChange={handleFuncChange} />
         </SidebarHeader>
         <SidebarContent>
-          <DictionaryCard text={selectedText} />
-          <TranslatorCard text={selectedText} />
+          {funcId == 1 && (
+            <>
+              <DictionaryCard text={selectedText} />
+            </>
+          )}
+          {funcId == 2 && (
+            <>
+              <DictionaryCard text={selectedText} />
+            </>
+          )}
+          {funcId == 3 && (
+            <>
+              <LectureNotetaker />
+            </>
+          )}
         </SidebarContent>
         <SidebarFooter></SidebarFooter>
         <SidebarRail />

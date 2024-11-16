@@ -27,6 +27,7 @@ type InputProps = {
   onChange?: (file?: File) => void | Promise<void>;
   disabled?: boolean;
   dropzoneOptions?: Omit<DropzoneOptions, "disabled">;
+  type?: string;
 };
 
 const ERROR_MESSAGES = {
@@ -46,7 +47,16 @@ const ERROR_MESSAGES = {
 
 const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { dropzoneOptions, width, height, value, className, disabled, onChange },
+    {
+      dropzoneOptions,
+      width,
+      height,
+      value,
+      className,
+      disabled,
+      onChange,
+      type,
+    },
     ref
   ) => {
     const imageUrl = React.useMemo(() => {
@@ -70,7 +80,7 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
       isDragAccept,
       isDragReject,
     } = useDropzone({
-      accept: { "image/*": [] },
+      accept: type === "audio" ? { "audio/*": [] } : { "image/*": [] },
       multiple: false,
       disabled,
       onDrop: (acceptedFiles) => {
@@ -154,7 +164,7 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
               <UploadCloudIcon className="mb-2 h-7 w-7" />
               <div className="text-gray-400">
                 Click or darg file to this area to upload
-                </div>
+              </div>
             </div>
           )}
 
