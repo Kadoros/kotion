@@ -6,9 +6,10 @@ import { FileSystemItem } from "@/types";
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get("q");
-    const type = searchParams.get("type"); // 'file' or 'directory' or null for both
+    const url = new URL(request.url);
+
+    const query = url.searchParams.get("q");
+    const type = url.searchParams.get("type"); // 'file' or 'directory' or null for both
 
     if (!query) {
       return NextResponse.json(
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
             name: item,
             path: itemRelativePath.replace(/\\/g, "/"),
             type: itemType,
-            modifiedAt: stats.mtime.toISOString()
+            modifiedAt: stats.mtime.toISOString(),
           };
 
           if (stats.isFile()) {

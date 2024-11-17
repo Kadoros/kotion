@@ -7,8 +7,9 @@ import { Readable } from 'stream';
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const folderPath = searchParams.get('path');
+    const url = new URL(request.url);
+
+    const folderPath = url.searchParams.get('path');
     
     if (!folderPath) {
       return NextResponse.json({ error: 'Folder path is required' }, { status: 400 });
