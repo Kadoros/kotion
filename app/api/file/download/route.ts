@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next";
+// app/api/file/download/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { getErrorMessage } from "@/lib/utils";
 
-// Function to validate the file path and prevent directory traversal
 function validatePath(fullPath: string) {
   const normalizedPath = path.normalize(fullPath);
   const baseDir = path.join(process.cwd(), "public", "files");
@@ -13,7 +13,6 @@ function validatePath(fullPath: string) {
   return normalizedPath;
 }
 
-// Function to get the MIME type based on the file extension
 function getMimeType(filePath: string): string {
   const extension = path.extname(filePath).toLowerCase();
   const mimeTypes: { [key: string]: string } = {
@@ -28,9 +27,11 @@ function getMimeType(filePath: string): string {
     ".svg": "image/svg+xml",
     ".pdf": "application/pdf",
     ".doc": "application/msword",
-    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".docx":
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ".xls": "application/vnd.ms-excel",
-    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".xlsx":
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ".zip": "application/zip",
     ".txt": "text/plain",
     ".mp3": "audio/mpeg",
@@ -38,39 +39,55 @@ function getMimeType(filePath: string): string {
   };
   return mimeTypes[extension] || "application/octet-stream";
 }
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(request: NextRequest) {
   try {
-    const filePath = req.query.path as string;
+    const body = await request.json();
+    const encodedPath = body.path;
 
-    if (!filePath) {
-      return res.status(400).json({ error: "File path is required" });
+    if (!encodedPath) {
+      return NextResponse.json(
+        { error: "File path is required" },
+        { status: 400 }
+      );
     }
 
-    const fullPath = path.join(process.cwd(), "public", "files", filePath);
+    const decodedPath = decodeURIComponent(encodedPath); // Decode the path
+    const fullPath = path.join(process.cwd(), "public", "files", decodedPath);
     const validatedPath = validatePath(fullPath);
 
     // Check if file exists and is not a directory
-    if (!fs.existsSync(validatedPath) || fs.statSync(validatedPath).isDirectory()) {
-      return res.status(404).json({ error: "File not found" });
+    if (
+      !fs.existsSync(validatedPath) ||
+      fs.statSync(validatedPath).isDirectory()
+    ) {
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
     const file = fs.readFileSync(validatedPath);
     const stats = fs.statSync(validatedPath);
     const mimeType = getMimeType(validatedPath);
 
-    res.setHeader("Content-Disposition", `attachment; filename=${encodeURIComponent(path.basename(filePath))}`);
-    res.setHeader("Content-Type", mimeType);
-    res.setHeader("Content-Length", stats.size.toString());
-    res.setHeader("Cache-Control", "no-cache");
-
-    return res.status(200).send(file);
+    return new NextResponse(file, {
+      headers: {
+        "Content-Disposition": `attachment; filename=${encodeURIComponent(
+          path.basename(decodedPath)
+        )}`,
+        "Content-Type": mimeType,
+        "Content-Length": stats.size.toString(),
+        "Cache-Control": "no-cache",
+      },
+    });
   } catch (error) {
     console.error("Error downloading file:", error);
-    return res.status(
-      error instanceof Error && error.message.includes("Directory traversal") ? 403 : 500
-    ).json({
-      error: getErrorMessage(error) || "An error occurred while downloading the file.",
-    });
+    return NextResponse.json(
+      { error: getErrorMessage(error) },
+      {
+        status:
+          error instanceof Error &&
+          error.message.includes("Directory traversal")
+            ? 403
+            : 500,
+      }
+    );
   }
 }

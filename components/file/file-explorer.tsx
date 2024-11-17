@@ -162,9 +162,13 @@ const FileExplorerItem = ({
   const fetchChildren = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/file?path=${encodeURIComponent(item.path)}`
-      );
+      const response = await fetch("/api/file", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ path: encodeURIComponent(item.path) }),
+      });
       if (!response.ok) throw new Error("Failed to fetch children");
       const data = await response.json();
       setChildren(data);
@@ -185,10 +189,16 @@ const FileExplorerItem = ({
       setDownloading(true);
       const endpoint =
         item.type === "directory"
-          ? `/api/file/download/folder?path=${encodeURIComponent(item.path)}`
-          : `/api/file/download?path=${encodeURIComponent(item.path)}`;
+          ? "/api/file/download/folder"
+          : "/api/file/download";
 
-      const response = await fetch(endpoint);
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ path: encodeURIComponent(item.path) }), // Include the path in the request body
+      });
 
       if (!response.ok) {
         throw new Error(`Download failed: ${response.statusText}`);
@@ -349,7 +359,6 @@ const FileExplorerItem = ({
   );
 };
 
-
 // Main FileExplorer Component
 const FileExplorer = () => {
   const [items, setItems] = useState<FileSystemItem[]>([]);
@@ -386,9 +395,16 @@ const FileExplorer = () => {
       setError(null);
 
       const typeParam = type === "all" ? "" : `&type=${type}`;
-      const response = await fetch(
-        `/api/file/search?q=${encodeURIComponent(query)}${typeParam}`
-      );
+      const response = await fetch("/api/file/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query,
+          type: typeParam, // Send `undefined` for "all" to omit type
+        }),
+      });
 
       if (!response.ok) throw new Error("Search failed");
 

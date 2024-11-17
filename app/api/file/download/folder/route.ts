@@ -1,10 +1,11 @@
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import archiver from "archiver";
-import { NextApiRequest, NextApiResponse } from "next";
+import { Readable } from "stream";
 import { getErrorMessage } from "@/lib/utils";
 
-const MAX_ZIP_SIZE = 299 * 1024 * 1024; // 500MB limit
+const MAX_ZIP_SIZE = 500 * 1024 * 1024; // 500MB limit
 
 function validatePath(fullPath: string) {
   const normalizedPath = path.normalize(fullPath);
@@ -15,29 +16,28 @@ function validatePath(fullPath: string) {
   return normalizedPath;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export async function GET(request: NextRequest) {
   try {
-    const folderPath = req.query.path as string;
+    const folderPath = request.nextUrl.searchParams.get("path");
 
     if (!folderPath) {
-      return res.status(400).json({ error: "Folder path is required" });
+      return NextResponse.json(
+        { error: "Folder path is required" },
+        { status: 400 }
+      );
     }
 
     const fullPath = path.join(process.cwd(), "public", "files", folderPath);
     const validatedPath = validatePath(fullPath);
 
-    // Check if folder exists and is a directory
     if (
       !fs.existsSync(validatedPath) ||
       !fs.statSync(validatedPath).isDirectory()
     ) {
-      return res.status(404).json({ error: "Folder not found" });
+      return NextResponse.json({ error: "Folder not found" }, { status: 404 });
     }
 
-    // Calculate total size before zipping
+    // Calculate folder size
     let totalSize = 0;
     const calculateSize = (dirPath: string) => {
       const items = fs.readdirSync(dirPath);
@@ -54,49 +54,57 @@ export default async function handler(
     calculateSize(validatedPath);
 
     if (totalSize > MAX_ZIP_SIZE) {
-      return res.status(413).json({
-        error: "Folder size exceeds maximum limit of 500MB",
-      });
+      return NextResponse.json(
+        { error: "Folder size exceeds maximum limit of 500MB" },
+        { status: 413 }
+      );
     }
 
-    // Create a zip archive
-    const archive = archiver("zip", {
-      zlib: { level: 9 }, // Maximum compression
-    });
+    // Create the ZIP archive
+    const archive = archiver("zip", { zlib: { level: 9 } });
+    const stream = new Readable().wrap(archive);
 
-    res.setHeader("Content-Disposition", `attachment; filename=${encodeURIComponent(path.basename(folderPath))}.zip`);
-    res.setHeader("Content-Type", "application/zip");
-    res.setHeader("Cache-Control", "no-cache");
-
-    // Pipe the archive to the response
-    archive.pipe(res);
-
-    // Function to recursively add files to archive
+    // Add files and directories recursively
     const addFilesToArchive = (currentPath: string, relativePath: string = "") => {
       const items = fs.readdirSync(currentPath);
-
       items.forEach((item) => {
         const itemPath = path.join(currentPath, item);
         const itemRelativePath = path.join(relativePath, item);
-        const stat = fs.statSync(itemPath);
+        const stats = fs.statSync(itemPath);
 
-        if (stat.isFile()) {
+        if (stats.isFile()) {
           archive.file(itemPath, { name: itemRelativePath });
-        } else if (stat.isDirectory()) {
+        } else if (stats.isDirectory()) {
           archive.directory(itemPath, itemRelativePath);
         }
       });
     };
-
-    // Add files to archive
     addFilesToArchive(validatedPath);
 
-    // Finalize the archive to start streaming
+    // Finalize the archive
     archive.finalize();
-  } catch (error) {
-    console.error("Error creating zip archive:", error);
-    return res.status(error instanceof Error && error.message.includes("Directory traversal") ? 403 : 500).json({
-      error: getErrorMessage(error),
+
+    // Respond with the ZIP file stream
+    return new NextResponse(stream as any, {
+      headers: {
+        "Content-Disposition": `attachment; filename=${encodeURIComponent(
+          path.basename(folderPath)
+        )}.zip`,
+        "Content-Type": "application/zip",
+        "Cache-Control": "no-cache",
+      },
     });
+  } catch (error) {
+    console.error("Error creating ZIP archive:", error);
+    return NextResponse.json(
+      { error: getErrorMessage(error) },
+      {
+        status:
+          error instanceof Error &&
+          error.message.includes("Directory traversal")
+            ? 403
+            : 500,
+      }
+    );
   }
 }

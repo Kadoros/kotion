@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { getErrorMessage } from "@/lib/utils";
 import { FileSystemItem } from "@/types";
 
+// Function to validate and normalize paths
 function validatePath(fullPath: string) {
   const normalizedPath = path.normalize(fullPath);
   const baseDir = path.join(process.cwd(), "public", "files");
@@ -13,24 +14,26 @@ function validatePath(fullPath: string) {
   return normalizedPath;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+// POST handler to process file/directory paths
+export async function POST(request: NextRequest) {
   try {
-    const relativePath = (req.query.path as string) || "";
+    const body = await request.json();
+    const relativePath = decodeURIComponent(body.path || ""); // Decode the path
     const fullPath = path.join(process.cwd(), "public", "files", relativePath);
 
     // Validate path
     const validatedPath = validatePath(fullPath);
 
     if (!fs.existsSync(validatedPath)) {
-      return res.status(404).json({ error: "Path not found" });
+      return NextResponse.json({ error: "Path not found" }, { status: 404 });
     }
 
     const stats = fs.statSync(validatedPath);
     if (!stats.isDirectory()) {
-      return res.status(400).json({ error: "Path is not a directory" });
+      return NextResponse.json(
+        { error: "Path is not a directory" },
+        { status: 400 }
+      );
     }
 
     const items = fs.readdirSync(validatedPath);
@@ -55,7 +58,7 @@ export default async function handler(
           path: relativeItemPath.replace(/\\/g, "/"),
           type: "directory",
           modifiedAt: stats.mtime.toISOString(),
-          children: [], // Initialize empty children array for directories
+          children: [],
         };
       })
     );
@@ -68,13 +71,18 @@ export default async function handler(
       return a.type === "directory" ? -1 : 1;
     });
 
-    return res.status(200).json(fileSystemItems);
+    return NextResponse.json(fileSystemItems);
   } catch (error) {
     console.error("Error reading directory:", error);
-    return res.status(
-      error instanceof Error && error.message.includes("Directory traversal")
-        ? 403
-        : 500
-    ).json({ error: getErrorMessage(error) });
+    return NextResponse.json(
+      { error: getErrorMessage(error) },
+      {
+        status:
+          error instanceof Error &&
+          error.message.includes("Directory traversal")
+            ? 403
+            : 500,
+      }
+    );
   }
 }

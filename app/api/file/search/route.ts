@@ -1,25 +1,23 @@
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { NextApiRequest, NextApiResponse } from "next";
 import { getErrorMessage } from "@/lib/utils";
 import { FileSystemItem } from "@/types";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export async function POST(request: NextRequest) {
   try {
-    const query = req.query.q as string;
-    const type = req.query.type as string;
+    const { query, type } = await request.json();
 
     if (!query) {
-      return res.status(400).json({ error: "Search query is required" });
+      return NextResponse.json(
+        { error: "Search query is required" },
+        { status: 400 }
+      );
     }
 
     const baseDir = path.join(process.cwd(), "public", "files");
     const results: FileSystemItem[] = [];
 
-    // Recursive function to search files and directories
     const searchFiles = (dir: string, relativePath: string = "") => {
       const items = fs.readdirSync(dir);
 
@@ -56,7 +54,6 @@ export default async function handler(
 
     searchFiles(baseDir);
 
-    // Sort results: directories first, then files, both alphabetically
     results.sort((a, b) => {
       if (a.type === b.type) {
         return a.name.localeCompare(b.name);
@@ -64,11 +61,12 @@ export default async function handler(
       return a.type === "directory" ? -1 : 1;
     });
 
-    return res.status(200).json(results);
+    return NextResponse.json(results);
   } catch (error) {
     console.error("Error searching files:", error);
-    return res.status(500).json({
-      error: getErrorMessage(error) || "An error occurred while searching files.",
-    });
+    return NextResponse.json(
+      { error: getErrorMessage(error) },
+      { status: 500 }
+    );
   }
 }
