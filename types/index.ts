@@ -1,4 +1,14 @@
 // types.ts
+export interface FileSystemItem {
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  children?: FileSystemItem[];
+  size?: number;
+  modifiedAt?: string;
+}
+
+
 export enum UserRole {
   USER = "user",
   MANAGER = "manager",

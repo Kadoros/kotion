@@ -33,7 +33,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import DocumentList from "@/components/sidebar/document-list";
 import { toast } from "sonner";
-import Item from "@/components/sidebar/item";
+import Item from "@/components/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import TrashBox from "@/components/sidebar/trash-box";
 
