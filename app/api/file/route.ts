@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
 import path from "path";
 import { getErrorMessage } from "@/lib/utils";
@@ -13,53 +13,24 @@ function validatePath(fullPath: string) {
   return normalizedPath;
 }
 
-function getMimeType(filePath: string): string {
-  const extension = path.extname(filePath).toLowerCase();
-  const mimeTypes: { [key: string]: string } = {
-    ".html": "text/html",
-    ".css": "text/css",
-    ".js": "text/javascript",
-    ".json": "application/json",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".gif": "image/gif",
-    ".svg": "image/svg+xml",
-    ".pdf": "application/pdf",
-    ".doc": "application/msword",
-    ".docx":
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ".xls": "application/vnd.ms-excel",
-    ".xlsx":
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    ".zip": "application/zip",
-    ".txt": "text/plain",
-    ".mp3": "audio/mpeg",
-    ".mp4": "video/mp4",
-  };
-  return mimeTypes[extension] || "application/octet-stream";
-}
-
-export async function GET(request: NextRequest) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
-    const url = new URL(request.url);
-
-    const relativePath = url.searchParams.get("path") || "";
+    const relativePath = (req.query.path as string) || "";
     const fullPath = path.join(process.cwd(), "public", "files", relativePath);
 
     // Validate path
     const validatedPath = validatePath(fullPath);
 
     if (!fs.existsSync(validatedPath)) {
-      return NextResponse.json({ error: "Path not found" }, { status: 404 });
+      return res.status(404).json({ error: "Path not found" });
     }
 
     const stats = fs.statSync(validatedPath);
     if (!stats.isDirectory()) {
-      return NextResponse.json(
-        { error: "Path is not a directory" },
-        { status: 400 }
-      );
+      return res.status(400).json({ error: "Path is not a directory" });
     }
 
     const items = fs.readdirSync(validatedPath);
@@ -97,18 +68,13 @@ export async function GET(request: NextRequest) {
       return a.type === "directory" ? -1 : 1;
     });
 
-    return NextResponse.json(fileSystemItems);
+    return res.status(200).json(fileSystemItems);
   } catch (error) {
     console.error("Error reading directory:", error);
-    return NextResponse.json(
-      { error: getErrorMessage(error) },
-      {
-        status:
-          error instanceof Error &&
-          error.message.includes("Directory traversal")
-            ? 403
-            : 500,
-      }
-    );
+    return res.status(
+      error instanceof Error && error.message.includes("Directory traversal")
+        ? 403
+        : 500
+    ).json({ error: getErrorMessage(error) });
   }
 }

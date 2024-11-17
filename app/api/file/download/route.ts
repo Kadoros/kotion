@@ -1,87 +1,76 @@
-// app/api/file/download/folder/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import archiver from 'archiver';
-import { Readable } from 'stream';
+import { NextApiRequest, NextApiResponse } from "next";
+import fs from "fs";
+import path from "path";
+import { getErrorMessage } from "@/lib/utils";
 
-export async function GET(request: NextRequest) {
+// Function to validate the file path and prevent directory traversal
+function validatePath(fullPath: string) {
+  const normalizedPath = path.normalize(fullPath);
+  const baseDir = path.join(process.cwd(), "public", "files");
+  if (!normalizedPath.startsWith(baseDir)) {
+    throw new Error("Invalid path: Directory traversal detected");
+  }
+  return normalizedPath;
+}
+
+// Function to get the MIME type based on the file extension
+function getMimeType(filePath: string): string {
+  const extension = path.extname(filePath).toLowerCase();
+  const mimeTypes: { [key: string]: string } = {
+    ".html": "text/html",
+    ".css": "text/css",
+    ".js": "text/javascript",
+    ".json": "application/json",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".svg": "image/svg+xml",
+    ".pdf": "application/pdf",
+    ".doc": "application/msword",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".xls": "application/vnd.ms-excel",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".zip": "application/zip",
+    ".txt": "text/plain",
+    ".mp3": "audio/mpeg",
+    ".mp4": "video/mp4",
+  };
+  return mimeTypes[extension] || "application/octet-stream";
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const url = new URL(request.url);
+    const filePath = req.query.path as string;
 
-    const folderPath = url.searchParams.get('path');
-    
-    if (!folderPath) {
-      return NextResponse.json({ error: 'Folder path is required' }, { status: 400 });
+    if (!filePath) {
+      return res.status(400).json({ error: "File path is required" });
     }
 
-    const fullPath = path.join(process.cwd(), 'public', 'files', folderPath);
+    const fullPath = path.join(process.cwd(), "public", "files", filePath);
+    const validatedPath = validatePath(fullPath);
 
-    // Check if folder exists and is a directory
-    if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) {
-      return NextResponse.json({ error: 'Folder not found' }, { status: 404 });
+    // Check if file exists and is not a directory
+    if (!fs.existsSync(validatedPath) || fs.statSync(validatedPath).isDirectory()) {
+      return res.status(404).json({ error: "File not found" });
     }
 
-    // Create a zip archive
-    const archive = archiver('zip', {
-      zlib: { level: 9 } // Maximum compression
-    });
+    const file = fs.readFileSync(validatedPath);
+    const stats = fs.statSync(validatedPath);
+    const mimeType = getMimeType(validatedPath);
 
-    // Create an array to store chunks of data
-    const chunks: Uint8Array[] = [];
+    res.setHeader("Content-Disposition", `attachment; filename=${encodeURIComponent(path.basename(filePath))}`);
+    res.setHeader("Content-Type", mimeType);
+    res.setHeader("Content-Length", stats.size.toString());
+    res.setHeader("Cache-Control", "no-cache");
 
-    // Handle archive data
-    archive.on('data', (chunk) => chunks.push(chunk));
-
-    // Handle archive warnings
-    archive.on('warning', (err) => {
-      if (err.code === 'ENOENT') {
-        console.warn('Archive warning:', err);
-      } else {
-        throw err;
-      }
-    });
-
-    // Handle archive errors
-    archive.on('error', (err) => {
-      throw err;
-    });
-
-    // Function to recursively add files to archive
-    const addFilesToArchive = (currentPath: string, relativePath: string = '') => {
-      const items = fs.readdirSync(currentPath);
-      
-      items.forEach(item => {
-        const itemPath = path.join(currentPath, item);
-        const itemRelativePath = path.join(relativePath, item);
-        const stat = fs.statSync(itemPath);
-
-        if (stat.isFile()) {
-          archive.file(itemPath, { name: itemRelativePath });
-        } else if (stat.isDirectory()) {
-          archive.directory(itemPath, itemRelativePath);
-        }
-      });
-    };
-
-    // Add files to archive
-    addFilesToArchive(fullPath);
-
-    // Finalize the archive
-    await archive.finalize();
-
-    // Create a buffer from the chunks
-    const buffer = Buffer.concat(chunks);
-
-    // Return the ZIP file
-    return new NextResponse(buffer, {
-      headers: {
-        'Content-Disposition': `attachment; filename=${path.basename(folderPath)}.zip`,
-        'Content-Type': 'application/zip',
-      },
-    });
+    return res.status(200).send(file);
   } catch (error) {
-    console.error('Error creating zip archive:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error downloading file:", error);
+    return res.status(
+      error instanceof Error && error.message.includes("Directory traversal") ? 403 : 500
+    ).json({
+      error: getErrorMessage(error) || "An error occurred while downloading the file.",
+    });
   }
 }

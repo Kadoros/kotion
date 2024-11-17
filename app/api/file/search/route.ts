@@ -1,21 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { NextApiRequest, NextApiResponse } from "next";
 import { getErrorMessage } from "@/lib/utils";
 import { FileSystemItem } from "@/types";
 
-export async function GET(request: NextRequest) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
-    const url = new URL(request.url);
-
-    const query = url.searchParams.get("q");
-    const type = url.searchParams.get("type"); // 'file' or 'directory' or null for both
+    const query = req.query.q as string;
+    const type = req.query.type as string;
 
     if (!query) {
-      return NextResponse.json(
-        { error: "Search query is required" },
-        { status: 400 }
-      );
+      return res.status(400).json({ error: "Search query is required" });
     }
 
     const baseDir = path.join(process.cwd(), "public", "files");
@@ -66,12 +64,11 @@ export async function GET(request: NextRequest) {
       return a.type === "directory" ? -1 : 1;
     });
 
-    return NextResponse.json(results);
+    return res.status(200).json(results);
   } catch (error) {
     console.error("Error searching files:", error);
-    return NextResponse.json(
-      { error: getErrorMessage(error) },
-      { status: 500 }
-    );
+    return res.status(500).json({
+      error: getErrorMessage(error) || "An error occurred while searching files.",
+    });
   }
 }

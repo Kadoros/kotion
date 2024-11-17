@@ -158,6 +158,7 @@ const FileExplorerItem = ({
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
+  // Fetch children of the directory if expanded
   const fetchChildren = async () => {
     try {
       setLoading(true);
@@ -175,6 +176,7 @@ const FileExplorerItem = ({
     }
   };
 
+  // Handle downloading of files or folders
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (downloading) return;
@@ -212,6 +214,7 @@ const FileExplorerItem = ({
     }
   };
 
+  // Handle expanding directories
   const handleExpand = async (event: React.MouseEvent) => {
     event.stopPropagation();
     if (item.type === "directory") {
@@ -223,10 +226,21 @@ const FileExplorerItem = ({
     }
   };
 
+  // Handle opening files or folders
+  const open = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (item.type === "directory") {
+      handleExpand(event); // Expand the folder to show its contents
+    } else {
+      // Open the file in a new tab (e.g., PDF, text file)
+      window.open(`/files/${encodeURIComponent(item.path)}`, "_blank");
+    }
+  };
+
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      handleExpand(event as unknown as React.MouseEvent);
+      open(event as unknown as React.MouseEvent); // Open on enter or space
     }
   };
 
@@ -236,7 +250,7 @@ const FileExplorerItem = ({
   return (
     <div>
       <div
-        onClick={handleExpand}
+        onClick={open} // Open on click
         onKeyDown={handleKeyPress}
         role="button"
         tabIndex={0}
@@ -334,6 +348,7 @@ const FileExplorerItem = ({
     </div>
   );
 };
+
 
 // Main FileExplorer Component
 const FileExplorer = () => {
