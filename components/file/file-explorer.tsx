@@ -370,7 +370,16 @@ const FileExplorer = () => {
   const fetchRootItems = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/file");
+      const response = await fetch("/api/file", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          path: "",
+        }),
+      });
+      
       if (!response.ok) throw new Error("Failed to fetch root items");
       const data = await response.json();
       setItems(data);
