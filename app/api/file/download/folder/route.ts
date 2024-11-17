@@ -109,3 +109,14 @@
 //     );
 //   }
 // }
+
+import { NextRequest, NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
+import archiver from "archiver";
+import { Readable } from "stream";
+import { getErrorMessage } from "@/lib/utils";
+
+export async function POST(request: NextRequest) {
+  return new NextResponse("dev");
+}
