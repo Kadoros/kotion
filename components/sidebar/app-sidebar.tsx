@@ -16,7 +16,9 @@ import {
   Settings,
   Settings2,
   SquareTerminal,
+  GraduationCap,
   Trash,
+  ChevronRight,
 } from "lucide-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -28,6 +30,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenuButton,
   SidebarProvider,
   SidebarRail,
 } from "@/components/ui/sidebar";
@@ -43,6 +46,19 @@ import { toast } from "sonner";
 
 import TrashBox from "@/app/(main)/_components/trash-box";
 import { useMediaQuery } from "usehooks-ts";
+import {
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from "../ui/sidebarL";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
 
 // This is sample data.
 const data = {
@@ -54,7 +70,7 @@ const data = {
   teams: [
     {
       name: "Acme Inc",
-      logo: GalleryVerticalEnd,
+      logo: AudioWaveform,
       plan: "Enterprise",
     },
     {
@@ -70,87 +86,75 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Tools",
       url: "#",
-      icon: SquareTerminal,
+      icon: GalleryVerticalEnd,
       isActive: true,
       items: [
         {
           title: "PDF Viewer",
           url: "/pdf",
         },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
+        // {
+        //   title: "Starred",
+        //   url: "#",
+        // },
+        // {
+        //   title: "Settings",
+        //   url: "#",
+        // },
       ],
     },
+    // {
+    //   title: "Models",
+    //   url: "#",
+    //   icon: Bot,
+    //   items: [
+    //     {
+    //       title: "Genesis",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Explorer",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Quantum",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Documentation",
+    //   url: "#",
+    //   icon: BookOpen,
+    //   items: [
+    //     {
+    //       title: "Introduction",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Get Started",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Tutorials",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Changelog",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
     {
-      title: "Models",
+      title: "IB",
       url: "#",
-      icon: Bot,
+      icon: GraduationCap,
       items: [
         {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          title: "Past Paper Question",
+          url: "/file",
         },
       ],
     },
@@ -187,16 +191,46 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <TeamSwitcher teams={data.teams} />
         </SidebarHeader>
         <SidebarContent>
-          <div>
-            <Item
-              label="Search"
-              icon={Search}
-              isSearch
-              onClick={search.onOpen}
-            />
-            <Item label="Setting" icon={Settings} onClick={settings.onOpen} />
-          </div>
-
+          <SidebarGroup>
+            <SidebarMenu>
+              <Collapsible
+                key={"Search"}
+                asChild
+                defaultOpen={true}
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      tooltip={"Search"}
+                      onClick={search.onOpen}
+                    >
+                      <Search />
+                      <span>{"Search"}</span>
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                </SidebarMenuItem>
+              </Collapsible>
+              <Collapsible
+                key={"Search"}
+                asChild
+                defaultOpen={true}
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      tooltip={"Setting"}
+                      onClick={settings.onOpen}
+                    >
+                      <Settings />
+                      <span>{"Setting"}</span>
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                </SidebarMenuItem>
+              </Collapsible>
+            </SidebarMenu>
+          </SidebarGroup>
           <NavDocumentList />
 
           <NavMain items={data.navMain} />

@@ -12,6 +12,10 @@ export default function AdminPage() {
     return <div>Loading...</div>;
   }
 
+  const handleClick = () => {
+
+  }
+
   return (
     <div className="size-full">
       <RoleGate allowedRoles={[UserRole.ADMIN]}>
@@ -21,13 +25,10 @@ export default function AdminPage() {
             {role}
           </p>
         </div>
+        
         <div className="flex flex-row justify-between items-center rounded-lg border p-3 shadow-sm">
-          <p className="text-sm font-bold">Admin-only API Route</p>
-          <Button>Click to test</Button>
-        </div>
-        <div className="flex flex-row justify-between items-center rounded-lg border p-3 shadow-sm">
-          <p className="text-sm font-bold">Admin-only Server Action</p>
-          <Button>Click to test</Button>
+          <p className="text-sm font-bold">File Index rebuild </p>
+          <Button onClick={() => handleClick()}>Click to test</Button>
         </div>
         <UserTable />
       </RoleGate>

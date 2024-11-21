@@ -1,4 +1,5 @@
 // lib/utils.ts
+import { FileSystemItem } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -50,3 +51,113 @@ export function getFileIconByMimeType(mimeType: string): string {
   return iconMap[mimeType] || 'file';
 }
 
+export const parseGroupFolder = (
+  name: string
+): Pick<FileSystemItem, "groupNumber" | "groupSubject"> => {
+  const match = name.match(/Group (\d+) - (.+)/);
+  if (match) {
+    return {
+      groupNumber: match[1],
+      groupSubject: match[2] as FileSystemItem["groupSubject"],
+    };
+  }
+  return {};
+};
+
+export const parseSubjectFolder = (
+  name: string
+): Pick<FileSystemItem, "subject" | "level"> => {
+  const parts = name.split("_");
+  if (parts.length === 2) {
+    return {
+      subject: parts[0] as FileSystemItem["subject"],
+      level: parts[1] as FileSystemItem["level"],
+    };
+  }
+  return {};
+};
+
+export const parseExamSessionFolder = (
+  name: string
+): Pick<FileSystemItem, "year" | "month"> => {
+  const match = name.match(/(\d{4}) (May|November)/);
+  if (match) {
+    return {
+      year: parseInt(match[1]),
+      month: match[2] as FileSystemItem["month"],
+    };
+  }
+  return {};
+};
+
+export const parseFileName = (name: string): Partial<FileSystemItem> => {
+  const parts = name.split("_");
+  const properties: Partial<FileSystemItem> = {};
+
+  if (parts.length < 3) return properties;
+
+  properties.subject = parts[0] as FileSystemItem["subject"];
+
+  // Parse paper number
+  const paperMatch = parts[2].match(/^\d/);
+  if (paperMatch) {
+    properties.paperNumber = parseInt(paperMatch[0]) as 1 | 2 | 3;
+  }
+
+  // Parse timezone
+  const tzPart = parts.find((p) => p.startsWith("TZ"));
+  if (tzPart) {
+    properties.timeZoneNumber = parseInt(tzPart.substring(2)) as 1 | 2 | 3;
+  }
+
+  // Parse level
+  const levelPart = parts.find((p) => p === "HL" || p === "SL");
+  if (levelPart) {
+    properties.level = levelPart as "HL" | "SL";
+  }
+
+  // Parse language (if present)
+  const langIndex = parts.findIndex((p) => p === "HL" || p === "SL") + 1;
+  if (langIndex < parts.length && !parts[langIndex].includes(".")) {
+    properties.language = parts[langIndex];
+  }
+
+  // Parse paper type
+  properties.paperType = parts.includes("markscheme")
+    ? "markscheme"
+    : "question paper";
+
+  return properties;
+};
+
+export const enrichItemWithProperties = (item: FileSystemItem): FileSystemItem => {
+  const pathParts = item.path.split("/").filter(Boolean);
+  let properties: Partial<FileSystemItem> = {};
+
+  // Process based on item depth in the hierarchy
+  if (pathParts.length >= 1) {
+    properties = { ...properties, ...parseGroupFolder(pathParts[0]) };
+  }
+
+  if (pathParts.length >= 2) {
+    properties = { ...properties, ...parseSubjectFolder(pathParts[1]) };
+  }
+
+  if (pathParts.length >= 3) {
+    properties = { ...properties, ...parseExamSessionFolder(pathParts[2]) };
+  }
+
+  // If it's a file, parse the filename
+  if (item.type === "file") {
+    properties = { ...properties, ...parseFileName(item.name) };
+  }
+
+  // Recursively process children if they exist
+  if (item.children) {
+    item.children = item.children.map(enrichItemWithProperties);
+  }
+
+  console.log(properties);
+
+  return { ...item, ...properties };
+};

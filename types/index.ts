@@ -1,14 +1,47 @@
 // types.ts
 export interface FileSystemItem {
+  // Base properties
   name: string;
   path: string;
-  type: 'file' | 'directory';
+  type: "file" | "directory";
   children?: FileSystemItem[];
   size?: number;
   modifiedAt?: string;
+
+  // Group properties (1st layer)
+  groupNumber?: string;
+  groupSubject?: string;
+
+  // Subject properties (2nd layer)
+  subject?: string;
+  level?: "HL" | "SL";
+
+  // Examination Session properties (3rd layer)
+  year?: number;
+  month?: "May" | "November";
+
+  // File specific properties
+  paperNumber?: number;
+  timeZoneNumber?: number;
+  language?: string;
+  paperType?: "question paper" | "markscheme";
 }
 
+export interface ItemProps {
+  item: FileSystemItem;
+  level?: number;
+  expanded?: boolean;
+  onExpand?: () => void;
+  useFileSystem: () => FileSystemHook;
+}
 
+export interface FileSystemHook {
+  loading: boolean;
+  error: Error | string | null;
+  fetchDirectoryStructure: () => Promise<FileSystemItem[]>;
+  searchItems: (query: string, type?: string) => Promise<FileSystemItem[]>;
+  getChildren: (path: string) => Promise<FileSystemItem[]>; // Retrieves children for a given path
+}
 export enum UserRole {
   USER = "user",
   MANAGER = "manager",
@@ -20,8 +53,7 @@ export type UserData = {
   avatar: string;
   role: UserRole;
   email: string;
-  lastSignedInTime:string;
-  
+  lastSignedInTime: string;
 };
 
 export interface Definition {
