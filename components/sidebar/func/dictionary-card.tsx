@@ -10,16 +10,18 @@ import type {
   DictionaryCardProps,
 } from "@/types/index";
 import { cn } from "@/lib/utils";
+import {
+  SidebarGroup,
+  SidebarMenu,
+  useSidebar,
+} from "@/components/ui/sidebarL";
 
-const DictionaryCard: React.FC<DictionaryCardProps> = ({ 
-  text,
-  className,
-}) => {
+const DictionaryCard: React.FC<DictionaryCardProps> = ({ text, className }) => {
   const [definition, setDefinition] = useState<DictionaryEntry | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
+  const { isMobile } = useSidebar();
   useEffect(() => {
     const fetchData = async () => {
       if (!text?.trim()) {
@@ -59,92 +61,108 @@ const DictionaryCard: React.FC<DictionaryCardProps> = ({
 
   if (!text?.trim()) {
     return (
-      <Card className={cn("w-full", className)}>
-        <CardContent className="p-6">
-          <Alert>
-            <AlertDescription>
-              Please enter a word to see its definition and translation.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden p-0 ">
+        <SidebarMenu>
+          <Card className={cn("w-full", className)}>
+            <CardContent className="p-6">
+              <Alert>
+                <AlertDescription>
+                  Please enter a word to see its definition and translation.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </SidebarMenu>
+      </SidebarGroup>
     );
   }
 
   if (loading) {
     return (
-      <Card className={cn("w-full", className)}>
-        <CardContent className="space-y-4 p-6">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-4 w-2/3" />
-        </CardContent>
-      </Card>
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden p-0 ">
+        <SidebarMenu>
+          <Card className={cn("w-full", className)}>
+            <CardContent className="space-y-4 p-6">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-2/3" />
+            </CardContent>
+          </Card>
+        </SidebarMenu>
+      </SidebarGroup>
     );
   }
 
   if (error) {
     return (
-      <Card className={cn("w-full", className)}>
-        <CardContent className="p-6">
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden p-0 ">
+        <SidebarMenu>
+          <Card className={cn("w-full", className)}>
+            <CardContent className="p-6">
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </SidebarMenu>
+      </SidebarGroup>
     );
   }
 
   return (
-    <Card className={cn("w-full", className)}>
-      <CardHeader>
-        <CardTitle className="text-xl font-bold">
-          {text}
-          {definition?.phonetic && (
-            <span className="ml-2 text-sm text-muted-foreground">
-              {definition.phonetic}
-            </span>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {definition && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Book className="h-5 w-5" />
-              <h3 className="font-semibold">Definition</h3>
-            </div>
-            <div className="space-y-2">
-              {definition.meanings?.map((meaning, index) => (
-                <div key={index} className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    {meaning.partOfSpeech}
-                  </p>
-                  <ul className="list-disc pl-6 space-y-1">
-                    {meaning.definitions?.slice(0, 3).map((def, idx) => (
-                      <li key={idx} className="text-sm">
-                        {def.definition}
-                        {def.example && (
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            Example: {def.example}
-                          </p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                  {meaning.synonyms.length > 0 && (
-                    <p className="text-sm">
-                      <span className="font-medium">Synonyms: </span>
-                      {meaning.synonyms.slice(0, 5).join(", ")}
-                    </p>
-                  )}
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden p-0 ">
+      <SidebarMenu>
+        <Card className={cn("w-full", className)}>
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">
+              {text}
+              {definition?.phonetic && (
+                <span className="ml-2 text-sm text-muted-foreground">
+                  {definition.phonetic}
+                </span>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {definition && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Book className="h-5 w-5" />
+                  <h3 className="font-semibold">Definition</h3>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                <div className="space-y-2">
+                  {definition.meanings?.map((meaning, index) => (
+                    <div key={index} className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {meaning.partOfSpeech}
+                      </p>
+                      <ul className="list-disc pl-6 space-y-1">
+                        {meaning.definitions?.slice(0, 3).map((def, idx) => (
+                          <li key={idx} className="text-sm">
+                            {def.definition}
+                            {def.example && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                Example: {def.example}
+                              </p>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                      {meaning.synonyms.length > 0 && (
+                        <p className="text-sm">
+                          <span className="font-medium">Synonyms: </span>
+                          {meaning.synonyms.slice(0, 5).join(", ")}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </SidebarMenu>
+    </SidebarGroup>
   );
 };
 

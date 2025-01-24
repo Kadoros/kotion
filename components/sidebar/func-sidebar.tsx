@@ -30,6 +30,7 @@ import {
   SidebarHeader,
   SidebarProvider,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebarL";
 
 import { FuncSwitcher } from "./func-switcher";
@@ -57,6 +58,8 @@ export function FuncSidebar({
   const selectedText = usePDFHighlight((state) => state.selectedText);
   const [funcId, setFuncId] = React.useState(1);
 
+
+
   const handleFuncChange = (id: number) => {
     setFuncId(id);
   };
@@ -67,6 +70,7 @@ export function FuncSidebar({
           <FuncSwitcher funcs={data.funcs} onFuncChange={handleFuncChange} />
         </SidebarHeader>
         <SidebarContent>
+          
           {funcId == 1 && (
             <>
               <DictionaryCard text={selectedText} />
