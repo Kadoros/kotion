@@ -1,9 +1,9 @@
 "use client";
-import { Cover } from "@/components/cover";
-import Editor from "@/components/editor";
+import { Cover } from "@/components/Editor/cover";
+
 import dynamic from "next/dynamic";
 
-import { Toolbar } from "@/components/toolbar";
+import { Toolbar } from "@/components/Editor/toolbar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -18,7 +18,7 @@ interface DocumentIdPageProps {
 
 const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
   const Editor = useMemo(
-    () => dynamic(() => import("@/components/editor"), { ssr: false }),
+    () => dynamic(() => import("@/components/Editor/editor"), { ssr: false }),
     []
   );
 

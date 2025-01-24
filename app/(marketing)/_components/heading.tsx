@@ -1,6 +1,6 @@
 "use clinet";
 
-import Spinner from "@/components/spinner";
+import Spinner from "@/components/global/spinner";
 import { Button } from "@/components/ui/button";
 import { SignInButton } from "@clerk/clerk-react";
 import { useConvexAuth } from "convex/react";

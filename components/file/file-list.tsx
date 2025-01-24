@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FileIcon } from "lucide-react"; // Or any icon of your choice
-import Item from "@/components/item"; // Adjust the import according to your setup
+import Item from "@/components/global/item"; // Adjust the import according to your setup
 
 interface FileListProps {
   parentFolderPath?: string; // To handle nested folders if necessary

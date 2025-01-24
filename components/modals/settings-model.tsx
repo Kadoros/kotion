@@ -3,7 +3,7 @@ import React from "react";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useSettings } from "@/hook/use-settings";
 import { Label } from "@/components/ui/label";
-import { ModeToggle } from "@/components/mode-toggle";
+import { ModeToggle } from "@/components/global/mode-toggle";
 
 export const SettingsModal = () => {
   const settings = useSettings();

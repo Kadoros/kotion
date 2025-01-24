@@ -1,5 +1,5 @@
 "use client";
-import Spinner from "@/components/spinner";
+import Spinner from "@/components/global/spinner";
 import { useConvexAuth } from "convex/react";
 import { redirect } from "next/navigation";
 import React from "react";

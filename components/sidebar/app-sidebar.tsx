@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/sidebar";
 import DocumentList from "@/components/sidebar/document-list";
 import { NavDocumentList } from "@/components/sidebar/nav-document-list";
-import Item from "@/components/item";
+
 import { useSearch } from "@/hook/use-search";
 import { useSettings } from "@/hook/use-settings";
 import { useMutation } from "convex/react";

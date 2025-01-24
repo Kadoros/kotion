@@ -1,7 +1,7 @@
 "use client";
 
 import { Doc } from "@/convex/_generated/dataModel";
-import { IconPickler } from "@/components/icon-picker";
+import { IconPickler } from "@/components/Editor/icon-picker";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, Smile, X } from "lucide-react";
 import { ElementRef, useRef, useState } from "react";

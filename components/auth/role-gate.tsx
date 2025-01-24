@@ -1,7 +1,6 @@
 // RoleGate.tsx
 import { useCurrentRole } from "@/hook/use-current-role";
 import React from "react";
-import FormError from "@/components/form-error";
 import { UserRole } from "@/types";
 import NoPermissionPage from "./no-permission-page";
 

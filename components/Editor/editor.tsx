@@ -15,9 +15,8 @@ import {
 import { BlockNoteView } from "@blocknote/mantine";
 import { useTheme } from "next-themes";
 import { useEdgeStore } from "@/lib/edgestore";
-import { useExport } from "@/hook/use-export";
 import { ExportModal } from "@/components/modals/export-modal";
-import { Navbar } from "@/components/Editor/navbar";
+
 import { ImportModal } from "@/components/modals/import-modal";
 import {
   Bot,
@@ -26,16 +25,6 @@ import {
   SquarePen,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import Logo from "@/app/(marketing)/_components/logo";
 
 interface EditorProps {
   onChange: (value: string) => void;

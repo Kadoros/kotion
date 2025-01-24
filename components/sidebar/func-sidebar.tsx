@@ -31,18 +31,7 @@ import {
   SidebarProvider,
   SidebarRail,
 } from "@/components/ui/sidebarL";
-import DocumentList from "@/components/sidebar/document-list";
-import { NavDocumentList } from "@/components/sidebar/nav-document-list";
-import Item from "@/components/item";
-import { useSearch } from "@/hook/use-search";
-import { useSettings } from "@/hook/use-settings";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
-import TrashBox from "@/app/(main)/_components/trash-box";
-import { useMediaQuery } from "usehooks-ts";
 import { FuncSwitcher } from "./func-switcher";
 
 import { usePDFHighlight } from "@/hook/use-pdf-highlight";
