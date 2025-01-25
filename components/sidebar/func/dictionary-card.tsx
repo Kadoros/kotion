@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Book, Globe2 } from "lucide-react";
+import { Book, Globe2, Plus, PlusCircle } from "lucide-react";
 import type {
   DictionaryEntry,
   TranslationResponse,
@@ -15,6 +15,8 @@ import {
   SidebarMenu,
   useSidebar,
 } from "@/components/ui/sidebarL";
+import { Button } from "@/components/ui/button";
+import PlusIconButton from "@/components/global/add-button";
 
 const DictionaryCard: React.FC<DictionaryCardProps> = ({ text, className }) => {
   const [definition, setDefinition] = useState<DictionaryEntry | null>(null);
@@ -114,13 +116,16 @@ const DictionaryCard: React.FC<DictionaryCardProps> = ({ text, className }) => {
       <SidebarMenu>
         <Card className={cn("w-full", className)}>
           <CardHeader>
-            <CardTitle className="text-xl font-bold">
-              {text}
-              {definition?.phonetic && (
-                <span className="ml-2 text-sm text-muted-foreground">
-                  {definition.phonetic}
-                </span>
-              )}
+            <CardTitle className="text-xl font-bold flex">
+              <div>
+                {text}
+                {definition?.phonetic && (
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {definition.phonetic}
+                  </span>
+                )}
+              </div>
+              <PlusIconButton className="ml-auto mt-1"/>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">

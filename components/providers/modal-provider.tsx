@@ -5,6 +5,7 @@ import { SettingsModal } from "@/components/modals/settings-model";
 import React, { useEffect, useState } from "react";
 import { CoverImageModal } from "@/components/modals/cover-image-modal";
 import { VoiceNoteModel } from "../modals/voice-note-model";
+import { OpenPdfWithModel } from "../modals/open-pdf-with-model";
 
 export const ModelProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -22,6 +23,7 @@ export const ModelProvider = () => {
       <SettingsModal />
       <CoverImageModal />
       <VoiceNoteModel />
+      <OpenPdfWithModel />
     </>
   );
 };
