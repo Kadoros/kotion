@@ -19,6 +19,7 @@ import {
   GraduationCap,
   Trash,
   ChevronRight,
+  LayoutDashboard,
 } from "lucide-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -41,7 +42,7 @@ import { useSearch } from "@/hook/use-search";
 import { useSettings } from "@/hook/use-settings";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import TrashBox from "@/app/(main)/_components/trash-box";
@@ -183,6 +184,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const search = useSearch();
   const settings = useSettings();
+  const router= useRouter()
 
   return (
     <SidebarProvider>
@@ -229,6 +231,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </CollapsibleTrigger>
                 </SidebarMenuItem>
               </Collapsible>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  tooltip={"Hub"}
+                  onClick={() => router.push("/hub")}
+                >
+                  <LayoutDashboard />
+                  <span>{"Hub"}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
           <NavDocumentList />
