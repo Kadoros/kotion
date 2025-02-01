@@ -23,7 +23,7 @@ const ErrorPage = () => {
       />
       <h2 className="text-xl font-medium">Something went wrong!</h2>
       <Button asChild>
-        <Link href={"/documents"}>Go Back</Link>
+        <Link href={"/hub"}>Go Back</Link>
       </Button>
     </div>
   );

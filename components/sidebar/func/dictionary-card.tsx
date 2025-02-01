@@ -3,32 +3,41 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Book, Globe2, Plus, PlusCircle } from "lucide-react";
-import type {
-  DictionaryEntry,
-  TranslationResponse,
-  DictionaryCardProps,
-} from "@/types/index";
+import { Book } from "lucide-react";
+import type { DictionaryEntry, DictionaryCardProps } from "@/types/index";
 import { cn } from "@/lib/utils";
-import {
-  SidebarGroup,
-  SidebarMenu,
-  useSidebar,
-} from "@/components/ui/sidebarL";
-import { Button } from "@/components/ui/button";
+import { SidebarGroup, SidebarMenu } from "@/components/ui/sidebarL";
 import PlusIconButton from "@/components/global/add-button";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Id } from "@/convex/_generated/dataModel";
 
 const DictionaryCard: React.FC<DictionaryCardProps> = ({ text, className }) => {
   const [definition, setDefinition] = useState<DictionaryEntry | null>(null);
-
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { isMobile } = useSidebar();
+  const [wordListId, setWordListId] = useState<Id<"wordLists"> | null>(null); // Initialize with null
+
+  // Fetch word lists using getWordList
+  const wordLists = useQuery(api.wordLists.getWordLists);
+
+  // Set the first word list as the default when wordLists are loaded
+  useEffect(() => {
+    if (wordLists && wordLists.length > 0 && !wordListId) {
+      setWordListId(wordLists[0]._id); // Set the first word list as the default
+    }
+  }, [wordLists, wordListId]);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!text?.trim()) {
         setDefinition(null);
-
         return;
       }
 
@@ -36,7 +45,6 @@ const DictionaryCard: React.FC<DictionaryCardProps> = ({ text, className }) => {
       setError(null);
 
       try {
-        // Fetch definition from Free Dictionary API
         const definitionResponse = await fetch(
           `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(text)}`
         );
@@ -45,14 +53,10 @@ const DictionaryCard: React.FC<DictionaryCardProps> = ({ text, className }) => {
           throw new Error("Failed to fetch data");
         }
 
-        const definitionData: DictionaryEntry[] =
-          await definitionResponse.json();
-
+        const definitionData: DictionaryEntry[] = await definitionResponse.json();
         setDefinition(definitionData[0]);
       } catch (err) {
-        setError(
-          "Failed to fetch definition or translation. Please try again."
-        );
+        setError("Failed to fetch definition or translation. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -122,19 +126,59 @@ const DictionaryCard: React.FC<DictionaryCardProps> = ({ text, className }) => {
                 {definition?.phonetic && (
                   <span className="ml-2 text-sm text-muted-foreground">
                     {definition.phonetic}
+                    {definition.phonetics?.[0]?.audio && (
+                      <button
+                        onClick={() =>
+                          new Audio(definition.phonetics[0].audio).play()
+                        }
+                        className="ml-1 text-blue-500 hover:underline"
+                      >
+                        🔊
+                      </button>
+                    )}
                   </span>
                 )}
               </div>
-              <PlusIconButton className="ml-auto mt-1"/>
+              {/* Conditionally render PlusIconButton */}
+              {wordLists && wordLists.length > 0 && (
+                <PlusIconButton
+                  className="ml-auto mt-1"
+                  dictionaryEntry={definition}
+                  wordListId={wordListId} // Pass the wordListId
+                />
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {definition && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Book className="h-5 w-5" />
-                  <h3 className="font-semibold">Definition</h3>
+                <div className="flex justify-between">
+                  <div className="flex items-center gap-2">
+                    <Book className="h-5 w-5" />
+                    <h3 className="font-semibold">Definition</h3>
+                  </div>
+                  {/* Conditionally render the word list dropdown */}
+                  {wordLists && wordLists.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <p className="text-sm text-gray-500 cursor-pointer hover:underline">
+                          on "{wordLists.find((list) => list._id === wordListId)?.name || "Select a list"}"
+                        </p>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {wordLists.map((list) => (
+                          <DropdownMenuItem
+                            key={list._id}
+                            onClick={() => setWordListId(list._id)}
+                          >
+                            {list.name}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
+
                 <div className="space-y-2">
                   {definition.meanings?.map((meaning, index) => (
                     <div key={index} className="space-y-2">

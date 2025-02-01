@@ -66,6 +66,8 @@ export interface Definition {
 export interface Phonetic {
   text: string;
   audio?: string;
+  license?: any;
+  sourceUrl?: any;
 }
 
 export interface Meaning {

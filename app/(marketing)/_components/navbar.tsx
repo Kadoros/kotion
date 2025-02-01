@@ -38,7 +38,7 @@ const Navbar = () => {
         {isAuthenticated && !isLoading && (
           <>
             <Button variant={"ghost"} size={"sm"}>
-              <Link href={"/documents"}>Enter Kotion</Link>
+              <Link href={"/hub"}>Enter Kotion</Link>
             </Button>
             <UserButton/>
           </>

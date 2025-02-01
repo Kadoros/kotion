@@ -11,7 +11,7 @@ const md2pdfPage = () => {
   return (
     <div className=" size-full">
       <div className="size-full">
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="max-w-4xl mx-auto">
        
           <div className="md:max-x-3xl lg:max-x-4xl max-x-4xl mx-auto">

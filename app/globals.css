@@ -92,3 +92,40 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes page-flip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+@keyframes cover-open {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+.animate-page-flip {
+  animation: page-flip 3s infinite ease-in-out;
+}
+
+.animate-cover-open {
+  animation: cover-open 3s infinite ease-in-out;
+}
+
+.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
+}
