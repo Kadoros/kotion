@@ -86,7 +86,7 @@ const WordMemorizingIntroduction = () => {
                     Memorize words and their translations.
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                    Example: "Apple" → "りんご" (Japanese)
+                    Example: &quot;Apple&quot; → &quot;りんご&quot; (Japanese)
                   </p>
                 </div>
                 <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
@@ -95,8 +95,8 @@ const WordMemorizingIntroduction = () => {
                     Memorize words and their dictionary definitions.
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                    Example: "Apple" → "A fruit with red or green skin and a
-                    crisp flesh."
+                    Example: &quot;Apple&quot; → &quot;A fruit with red or green
+                    skin and a crisp flesh.&quot;
                   </p>
                 </div>
               </div>
