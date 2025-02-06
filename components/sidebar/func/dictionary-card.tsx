@@ -162,7 +162,7 @@ const DictionaryCard: React.FC<DictionaryCardProps> = ({ text, className }) => {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <p className="text-sm text-gray-500 cursor-pointer hover:underline">
-                          on "{wordLists.find((list) => list._id === wordListId)?.name || "Select a list"}"
+                          on &quot;{wordLists.find((list) => list._id === wordListId)?.name || "Select a list"}&quot;
                         </p>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
