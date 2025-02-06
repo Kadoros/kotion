@@ -60,7 +60,7 @@ const WordMemorizingIntroduction = () => {
               <h3 className="text-2xl font-bold">Welcome to Word Memorizer!</h3>
               <p className="text-lg text-gray-600 dark:text-gray-400">
                 This app helps you memorize words efficiently by creating
-                personalized wordlists. Let's walk through the steps to create
+                personalized wordlists. Let&apos;s walk through the steps to create
                 your first wordlist.
               </p>
             </div>
@@ -95,8 +95,7 @@ const WordMemorizingIntroduction = () => {
                     Memorize words and their dictionary definitions.
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                    Example: &quot;Apple&quot; → &quot;A fruit with red or green
-                    skin and a crisp flesh.&quot;
+                  Example: &quot;Apple&quot; → &quot;A fruit with red or green skin and a crisp flesh.&quot;
                   </p>
                 </div>
               </div>
