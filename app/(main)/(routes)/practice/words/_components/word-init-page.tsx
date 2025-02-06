@@ -23,14 +23,8 @@ const WordMemorizingIntroduction = () => {
   const router = useRouter();
 
   const create = useMutation(api.wordLists.create);
-  const wordLists = useQuery(api.wordLists.getWordLists);
 
   // Redirect if word lists already exist
-  useEffect(() => {
-    if (wordLists && wordLists.length > 0) {
-      router.replace("/practice/words");
-    }
-  }, [wordLists, router]);
 
   const handleSubmit = async () => {
     try {
@@ -49,7 +43,6 @@ const WordMemorizingIntroduction = () => {
       toast.error("An error occurred while creating the word list.");
     }
   };
-
 
   return (
     <ProgressNavigation

@@ -28,11 +28,11 @@ const MainLayout = ({
     return redirect("/");
   }
   return (
-    <div className="h-full w-full flex dark:bg-[#1F1F1F]">
+    <div className="h-screen w-full flex dark:bg-[#1F1F1F]">
       <RoleGate allowedRoles={[UserRole.ADMIN, UserRole.MANAGER]}>
         {/* <Navigation /> */}
         <AppSidebar />
-        <main className="flex-1 h-full overflow-y-auto">
+        <main className="flex-1 h-screen overflow-y-auto">
           <SearchCommand />
           {children}
         </main>
