@@ -38,13 +38,23 @@ const SimpleWordCard = ({
             <Volume2 className="h-5 w-5 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
           </Button>
           <div>
-            <div className="text-lg font-medium text-gray-900 dark:text-gray-100">{word.word}</div>
+            <div className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              {word.word}
+            </div>
           </div>
         </div>
-        <Progress value={33} className="w-20 h-2 " />
+        <Progress
+          value={word.progress}
+          className={`w-20 h-2 transition-all duration-300 ${
+            isSelected
+              ? "bg-blue-500 dark:bg-blue-400"
+              : "bg-gray-300 dark:bg-gray-600"
+          }`}
+        />
       </div>
     </Card>
   );
 };
 
 export default SimpleWordCard;
+

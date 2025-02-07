@@ -10,6 +10,8 @@ import {
   Moon,
   Plus,
   PlusCircle,
+  ArrowDownAZ,
+  ClockArrowDown,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useQuery } from "convex/react";
@@ -32,16 +34,22 @@ import ExtendedWordCard from "./_components/extended-word-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import WordInitGate from "./_components/word-init-gate";
 
+import { motion } from "framer-motion";
+
 const WordPractice = () => {
   const words = useQuery(api.words.getWords, {});
   const wordLists = useQuery(api.wordLists.getWordLists);
-  
-  
+
   const [selectedList, setSelectedList] = useState<Doc<"wordLists"> | null>(
     null
   );
   const [filteredWords, setFilteredWords] = useState<Doc<"words">[]>([]);
   const [selectedWord, setSelectedWord] = useState<Doc<"words"> | null>(null); // New selectedWord state
+  const [sortMethod, setSortMethod] = useState<"alphabetical" | "recent">(
+    "alphabetical"
+  );
+
+  const [sortedWords, setSortedWords] = useState<Doc<"words">[]>([]);
 
   // Mock data for the filter options
   const options: (Doc<"wordLists"> | { _id: null; name: string })[] = [
@@ -69,6 +77,20 @@ const WordPractice = () => {
     }
   }, [words, selectedList]);
 
+  useEffect(() => {
+    if (!filteredWords) return;
+
+    const sorted = [...filteredWords].sort((a, b) => {
+      if (sortMethod === "alphabetical") {
+        return a.word.localeCompare(b.word);
+      } else {
+        return b._creationTime - a._creationTime;
+      }
+    });
+
+    setSortedWords(sorted);
+  }, [sortMethod, filteredWords]);
+
   // Handle word selection
   const handleWordSelect = (word: Doc<"words">) => {
     if (selectedWord == word) {
@@ -77,17 +99,17 @@ const WordPractice = () => {
       setSelectedWord(word);
     }
   };
-  
+
   return (
     <>
-      <WordInitGate wordLists={wordLists }>
+      <WordInitGate wordLists={wordLists}>
         <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#1F1F1F] text-gray-900 dark:text-gray-100 p-4 justify-center items-center">
           {/* Main Content */}
           <div className="flex w-full max-w-7xl mx-auto h-full justify-center p-4">
             <div
               className={`${
                 selectedWord ? "w-1/2 pr-4" : "w-full"
-              } flex flex-col max-w-md h-full`}
+              } flex flex-col max-w-md h-full  `}
             >
               <div className="flex flex-col items-center mb-8">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl mb-4 flex items-center justify-center ">
@@ -100,7 +122,25 @@ const WordPractice = () => {
               </div>
 
               <div className="flex justify-between items-center mb-4">
-                <span className="text-xl font-bold">151 words</span>
+                <span className="text-xl font-bold">
+                  {sortedWords.length} words
+                  <Button
+                    variant={"ghost"}
+                    onClick={() => {
+                      if (sortMethod === "alphabetical") {
+                        setSortMethod("recent");
+                      } else {
+                        setSortMethod("alphabetical");
+                      }
+                    }}
+                  >
+                    {sortMethod === "alphabetical" ? (
+                      <ArrowDownAZ />
+                    ) : (
+                      <ClockArrowDown />
+                    )}
+                  </Button>
+                </span>
                 <div className="flex items-center gap-x-2">
                   <Select onValueChange={handleSelect}>
                     <SelectTrigger className="w-[180px] text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700">
@@ -123,8 +163,9 @@ const WordPractice = () => {
 
               <ScrollArea className="h-full overflow-y-auto">
                 <div className="space-y-2 h-full">
-                  <AddWordCard />
-                  {filteredWords.map((word, index) => (
+                  <AddWordCard wordList={selectedList} />
+
+                  {sortedWords.map((word, index) => (
                     <SimpleWordCard
                       word={word}
                       key={index}

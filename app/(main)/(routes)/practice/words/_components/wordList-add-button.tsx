@@ -46,7 +46,7 @@ const WordListAddDialog = ({
 
   const [name, setName] = useState("");
 
-  const [mode, setMode] = useState<"definition" | "meaning">("meaning");
+  const [mode, setMode] = useState<"definition" | "translation">("translation");
 
   const onSubmit = async () => {
     if (!name) {
@@ -89,14 +89,14 @@ const WordListAddDialog = ({
             <Label>Mode</Label>
             <Select
               value={mode}
-              onValueChange={(value) => setMode(value as "definition" | "meaning")}
+              onValueChange={(value) => setMode(value as "definition" | "translation")}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select mode" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="translation">translation</SelectItem>
                 <SelectItem value="definition">Definition</SelectItem>
-                <SelectItem value="meaning">Meaning</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -13,7 +13,7 @@ export const addWord = mutation({
     ), // Array of phonetic representations
     meanings: v.array(
       v.object({
-        partOfSpeech: v.string(), // Part of speech
+        partOfSpeech: v.optional(v.string()), // Part of speech
         definitions: v.array(
           v.object({
             definition: v.string(), // The definition
@@ -38,7 +38,8 @@ export const addWord = mutation({
     const userId = identity.subject;
 
     if (args.wordListId) {
-      const wordList = await ctx.db.query("wordLists")
+      const wordList = await ctx.db
+        .query("wordLists")
         .filter((q) => q.eq(q.field("_id"), args.wordListId))
         .first();
 
@@ -47,8 +48,12 @@ export const addWord = mutation({
       }
     } else {
       // If wordListId is not provided, find the word list named "main" for the current user
-      const wordList = await ctx.db.query("wordLists")
-        .filter((q) => q.eq(q.field("name"), "main") && q.eq(q.field("userId"), userId))
+      const wordList = await ctx.db
+        .query("wordLists")
+        .filter(
+          (q) =>
+            q.eq(q.field("name"), "main") && q.eq(q.field("userId"), userId)
+        )
         .first();
 
       if (!wordList) {
@@ -68,6 +73,7 @@ export const addWord = mutation({
       createdAt: Date.now(),
       language: "en", // Default to English or pass this in the arguments
       userId, // Associate with the user who added the word
+      progress: 0,
       wordListId: args.wordListId, // Associate with the word list
     });
 

@@ -4,7 +4,7 @@ import { mutation, query } from "./_generated/server";
 export const create = mutation({
   args: {
     name: v.string(),
-    mode: v.union(v.literal("meaning"), v.literal("definition")),
+    mode: v.union(v.literal("translation"), v.literal("definition")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();

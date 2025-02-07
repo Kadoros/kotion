@@ -30,7 +30,7 @@ export default defineSchema({
     ),
     meanings: v.array(
       v.object({
-        partOfSpeech: v.string(),
+        partOfSpeech: v.optional(v.string()),
         definitions: v.array(
           v.object({
             definition: v.string(),
@@ -44,6 +44,7 @@ export default defineSchema({
       })
     ),
     createdAt: v.number(),
+    progress: v.number(),
     language: v.string(),
     userId: v.string(),
     wordListId: v.optional(v.id("wordLists")),
@@ -55,6 +56,6 @@ export default defineSchema({
     name: v.string(),
     userId: v.string(),
     createdAt: v.number(),
-    mode: v.union(v.literal("meaning"), v.literal("definition")), // Mode validation (optional)
+    mode: v.union(v.literal("translation"), v.literal("definition")), // Mode validation (optional)
   }).index("by_user", ["userId"]),
 });

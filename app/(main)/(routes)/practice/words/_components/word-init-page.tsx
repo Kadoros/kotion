@@ -17,8 +17,8 @@ import { redirect, useRouter } from "next/navigation";
 
 const WordMemorizingIntroduction = () => {
   const [wordlistName, setWordlistName] = useState("");
-  const [wordlistType, setWordlistType] = useState<"meaning" | "definition">(
-    "meaning"
+  const [wordlistType, setWordlistType] = useState<"translation" | "definition">(
+    "translation"
   );
   const router = useRouter();
 
@@ -81,7 +81,7 @@ const WordMemorizingIntroduction = () => {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <h4 className="text-lg font-semibold mb-2">Meaning</h4>
+                  <h4 className="text-lg font-semibold mb-2">Translation</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Memorize words and their translations.
                   </p>
@@ -136,14 +136,14 @@ const WordMemorizingIntroduction = () => {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <button
-                  onClick={() => setWordlistType("meaning")}
+                  onClick={() => setWordlistType("translation")}
                   className={`p-6 border rounded-lg text-left transition-all ${
-                    wordlistType === "meaning"
+                    wordlistType === "translation"
                       ? "border-blue-500 bg-blue-50 dark:bg-blue-900"
                       : "border-gray-200 dark:border-gray-700"
                   }`}
                 >
-                  <h4 className="text-lg font-semibold mb-2">Meaning</h4>
+                  <h4 className="text-lg font-semibold mb-2">Translation</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Memorize words and their translations.
                   </p>
