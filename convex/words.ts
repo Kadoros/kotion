@@ -27,7 +27,7 @@ export const addWord = mutation({
       })
     ), // Array of meanings
     wordListId: v.optional(v.id("wordLists")),
-    last_review: v.number(), // The last review timestamp
+    last_review: v.optional(v.number()), // The last review timestamp
     interval: v.optional(v.number()), // Spaced repetition interval
     repetition: v.optional(v.number()), // Number of repetitions
     ease: v.optional(v.float64()), // Ease factor for the spaced repetition
@@ -160,3 +160,94 @@ export const getWordsByWordListId = query({
     return null;
   },
 });
+
+
+export const updateWords = mutation({
+  args: {
+    words: v.array(
+      v.object({
+        _id: v.id("words"),
+        word: v.optional(v.string()),
+        phonetic: v.optional(v.string()),
+        phonetics: v.optional(
+          v.array(
+            v.object({
+              text: v.string(),
+              audio: v.optional(v.string()),
+            })
+          )
+        ),
+        meanings: v.optional(
+          v.array(
+            v.object({
+              partOfSpeech: v.optional(v.string()),
+              definitions: v.array(
+                v.object({
+                  definition: v.string(),
+                  example: v.optional(v.string()),
+                  synonyms: v.array(v.string()),
+                  antonyms: v.array(v.string()),
+                })
+              ),
+              synonyms: v.array(v.string()),
+              antonyms: v.array(v.string()),
+            })
+          )
+        ),
+        wordListId: v.optional(v.id("wordLists")),
+        last_review: v.optional(v.number()),
+        interval: v.optional(v.number()),
+        repetition: v.optional(v.number()),
+        ease: v.optional(v.float64()),
+        progress: v.optional(v.number()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    console.log("Word updates to be sent:", JSON.stringify(args.words, null, 2));
+
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const userId = identity.subject;
+
+    // Add detailed logging to understand what data we're receiving
+    console.log("Raw words input:", JSON.stringify(args.words, null, 2));
+
+    // Filter out invalid entries
+    const updatedWords = await Promise.all(
+      args.words.map(async (wordData) => {
+        const { _id, ...rest } = wordData;
+        const existingWord = await ctx.db.get(_id);
+        console.log("Existing word:", JSON.stringify(existingWord, null, 2));
+        
+        if (!existingWord) {
+          throw new Error(`Word not found: ${_id}`);
+        }
+
+        if (existingWord.userId !== userId) {
+          throw new Error("Unauthorized");
+        }
+
+        // Combine the existing word data with the updates
+        const updatedWord = {
+          ...existingWord,
+          ...rest, // This will overwrite the fields with the updated values
+        };
+        console.log(updatedWord);
+        
+
+        // Update the word in the database
+        await ctx.db.patch(_id, updatedWord);
+        return updatedWord;
+      })
+    );
+
+    console.log("Updated words:", JSON.stringify(updatedWords, null, 2));
+
+    return updatedWords;
+  },
+});
+

@@ -1,13 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import ProgressNavigation from "@/components/global/progress-navigation";
 import { Doc, Id } from "@/convex/_generated/dataModel";
-
 import WordCard from "./word-card-reviewer";
 import { useRouter, useSearchParams } from "next/navigation";
 import KnowCard from "./know-card";
+import { SM2 } from "@/lib/sm2";
+import { Button } from "@/components/ui/button";
+
 interface WordMemorizingInitPageProps {
   words: Doc<"words">[];
 }
@@ -15,15 +17,17 @@ interface WordMemorizingInitPageProps {
 const WordMemorizingInitPage: React.FC<WordMemorizingInitPageProps> = ({
   words,
 }) => {
-    const router = useRouter();
+  const router = useRouter();
+  const updateWords = useMutation(api.words.updateWords);
 
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [wordGradeMap, setWordGradeMap] = useState<{ [key: string]: number }>(
     {}
   );
-
   const [grade5Words, setGrade5Words] = useState<Doc<"words">[]>([]);
   const [flag, setFlag] = useState<boolean>(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleWordCardCompleted = () => {
     setCurrentStep((prevStep) => prevStep + 1);
@@ -38,16 +42,58 @@ const WordMemorizingInitPage: React.FC<WordMemorizingInitPageProps> = ({
     }
   }, [words]);
 
-  // New useEffect to update grade5Words when entering step 3
   useEffect(() => {
     if (currentStep === 3 && words && !flag) {
       const grade5Words = words.filter((word) => wordGradeMap[word._id] === 5);
       setGrade5Words(grade5Words);
       setFlag(true);
-      console.log(grade5Words);
     }
   }, [currentStep, words, wordGradeMap]);
 
+  const handelFinish = async () => {
+    try {
+      console.log("Starting handelFinish...");
+
+      const wordUpdates = words
+        .map((word) => {
+          const grade = wordGradeMap[word._id];
+
+          if (grade === undefined) {
+            console.error(`Skipping word ${word._id}: Grade is undefined`);
+            return null;
+          }
+
+          const sm2Result = SM2.processItem(word, grade);
+
+          if (!sm2Result) {
+            console.error(`Skipping word ${word._id}: SM2 result is invalid`);
+            return null;
+          }
+
+          const newProgress = 5;
+
+          return {
+            _id: word._id,
+            last_review: Date.now(),
+            progress: newProgress,
+            ...sm2Result,
+          };
+        })
+        .filter((update) => update !== null); // Remove null values
+
+      console.log(
+        "Word updates to be sent:",
+        JSON.stringify(wordUpdates, null, 2)
+      );
+
+      await updateWords({ words: wordUpdates });
+      console.log("Words updated successfully.");
+
+      router.push("/practice-hub/words");
+    } catch (error) {
+      console.error("Error updating words:", error);
+    }
+  };
   if (!words) {
     return <div>Loading...</div>;
   }
@@ -115,12 +161,14 @@ const WordMemorizingInitPage: React.FC<WordMemorizingInitPageProps> = ({
                   <p className="text-lg text-gray-600">
                     You've completed the word memorization process.
                   </p>
-                  <button
-                    onClick={() => router.push("/practice-hub/words")}
+                  <Button
+                    onClick={handelFinish}
+                    disabled={isLoading} // Disable Button while loading
                     className="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
                   >
-                    Restart
-                  </button>
+                    {isLoading ? "Updating..." : "Finish"}{" "}
+                    {/* Show loading text */}
+                  </Button>
                 </div>
               </div>
             )}

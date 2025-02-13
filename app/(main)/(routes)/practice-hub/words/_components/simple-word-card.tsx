@@ -44,7 +44,7 @@ const SimpleWordCard = ({
           </div>
         </div>
         <Progress
-          value={word.progress}
+          value={word.progress }
           className={`w-20 h-2 transition-all duration-300 ${
             isSelected
               ? "bg-blue-500 dark:bg-blue-400"
