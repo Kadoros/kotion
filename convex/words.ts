@@ -27,6 +27,10 @@ export const addWord = mutation({
       })
     ), // Array of meanings
     wordListId: v.optional(v.id("wordLists")),
+    last_review: v.number(), // The last review timestamp
+    interval: v.optional(v.number()), // Spaced repetition interval
+    repetition: v.optional(v.number()), // Number of repetitions
+    ease: v.optional(v.float64()), // Ease factor for the spaced repetition
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -75,11 +79,16 @@ export const addWord = mutation({
       userId, // Associate with the user who added the word
       progress: 0,
       wordListId: args.wordListId, // Associate with the word list
+      last_review: args.last_review, // Set the last review time
+      interval: args.interval ?? 1, // Default interval to 1 if not provided
+      repetition: args.repetition ?? 0, // Default repetition to 0 if not provided
+      ease: args.ease ?? 2.5, // Default ease to 2.5 if not provided
     });
 
     return word;
   },
 });
+
 export const getWordById = query({
   args: { wordId: v.id("words") },
   handler: async (ctx, args) => {
@@ -106,6 +115,7 @@ export const getWordById = query({
     return word;
   },
 });
+
 export const getWords = query({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -124,8 +134,9 @@ export const getWords = query({
     return words;
   },
 });
+
 export const getWordsByWordListId = query({
-  args: { wordListId: v.id("wordLists") },
+  args: { wordListId: v.optional(v.id("wordLists")) },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
@@ -136,13 +147,16 @@ export const getWordsByWordListId = query({
 
     const userId = identity.subject;
 
-    // Fetch all words associated with the given wordListId and userId
-    const words = await ctx.db
-      .query("words")
-      .filter((q) => q.eq(q.field("wordListId"), args.wordListId))
-      .filter((q) => q.eq(q.field("userId"), userId)) // Ensure the word belongs to the authenticated user
-      .collect();
+    if (args.wordListId) {
+      const words = await ctx.db
+        .query("words")
+        .filter((q) => q.eq(q.field("wordListId"), args.wordListId))
+        .filter((q) => q.eq(q.field("userId"), userId)) // Ensure the word belongs to the authenticated user
+        .collect();
 
-    return words;
+      return words;
+    }
+
+    return null;
   },
 });

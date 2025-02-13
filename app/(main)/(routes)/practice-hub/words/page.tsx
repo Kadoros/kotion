@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import WordListAddBtnComponent from "./_components/wordList-add-button";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import AddWordCard from "./_components/add-word-card";
 import { Doc } from "@/convex/_generated/dataModel";
 import ExtendedWordCard from "./_components/extended-word-card";
@@ -34,11 +34,12 @@ import ExtendedWordCard from "./_components/extended-word-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import WordInitGate from "./_components/word-init-gate";
 
-import { motion } from "framer-motion";
 
 const WordPractice = () => {
   const words = useQuery(api.words.getWords, {});
   const wordLists = useQuery(api.wordLists.getWordLists);
+
+  const router = useRouter()
 
   const [selectedList, setSelectedList] = useState<Doc<"wordLists"> | null>(
     null
@@ -116,7 +117,10 @@ const WordPractice = () => {
                   <div className="w-14 h-14 bg-white dark:bg-white/90 rounded-xl -translate-x-1 -translate-y-1" />
                 </div>
                 <h1 className="text-2xl font-bold mb-4">Practice your words</h1>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => {router.push(`/practice-hub/words/practice?word-list=${!!selectedList ? selectedList._id : "all"}`)}}
+                >
                   START NOW
                 </Button>
               </div>

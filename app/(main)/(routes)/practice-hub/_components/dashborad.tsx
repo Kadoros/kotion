@@ -31,7 +31,7 @@ const Dashboard = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 h-full">
       {/* Word Memorising Card */}
-      <Link href="/practice/words" className="block group h-full">
+      <Link href="/practice-hub/words" className="block group h-full">
         <Card className="shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-gray-800 h-full">
           <CardContent className="pt-8 pb-8 flex flex-col h-full">
             <div className="flex flex-col gap-4 flex-1">

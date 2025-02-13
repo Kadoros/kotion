@@ -36,8 +36,8 @@ const Dashboard = () => {
         </Card>
       </Link>
 
-      {/* PracticeHub Card */}
-      <Link href="/practice" className="block group h-full">
+      {/* practice-hubHub Card */}
+      <Link href="/practice-hub" className="block group h-full">
         <Card className="shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer transform hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-gray-800 h-full">
           <CardContent className="pt-8 pb-8 flex flex-col h-full">
             <div className="flex flex-col gap-4 flex-1">

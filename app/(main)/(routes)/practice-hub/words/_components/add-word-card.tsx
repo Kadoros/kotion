@@ -48,33 +48,33 @@ const AddWordCard = ({ wordList }: { wordList: Doc<"wordLists"> | null }) => {
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const pastedText = e.clipboardData.getData('text');
-    
+    const pastedText = e.clipboardData.getData("text");
+
     // Split the text into lines and filter out empty lines
-    const lines = pastedText.split('\n').filter(line => line.trim());
-    
+    const lines = pastedText.split("\n").filter((line) => line.trim());
+
     const parsedWords: { word: string; meaning: string }[] = [];
-    
+
     // Process pairs of lines (word and meaning)
     for (let i = 0; i < lines.length; i += 2) {
       // Check if we have both a word and its meaning
       if (i + 1 < lines.length) {
         const word = lines[i].trim();
-        const meanings = lines[i + 1].split(',').map(m => m.trim());
-        
+        const meanings = lines[i + 1].split(",").map((m) => m.trim());
+
         // Join multiple meanings with commas and remove duplicates
         const uniqueMeanings = Array.from(new Set(meanings));
-        const meaning = uniqueMeanings.join(', ');
-        
+        const meaning = uniqueMeanings.join(", ");
+
         parsedWords.push({ word, meaning });
       }
     }
-    
-    setPastedWords(prev => [...prev, ...parsedWords]);
-    
+
+    setPastedWords((prev) => [...prev, ...parsedWords]);
+
     // Clear the input fields since we're handling the paste in the preview section
-    setWord('');
-    setMeaning('');
+    setWord("");
+    setMeaning("");
   };
   // Handle form submission
   const handleSubmitAll = async () => {
@@ -129,7 +129,7 @@ const AddWordCard = ({ wordList }: { wordList: Doc<"wordLists"> | null }) => {
   return (
     <Card
       ref={cardRef}
-      className="bg-white dark:bg-[#2A2A2A] border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      className=" border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
       onClick={handleCardClick}
     >
       <div className="p-4 flex items-center justify-center">

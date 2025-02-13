@@ -52,7 +52,7 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
   }
 
   return (
-    <div>
+    <div className="bg-background h-full">
       <Navbar />
       <div className="max-w-4xl mx-auto">
         <Cover url={document.coverImage} />

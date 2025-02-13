@@ -28,7 +28,7 @@ const MainLayout = ({
     return redirect("/");
   }
   return (
-    <div className="h-screen w-full flex dark:bg-[#1F1F1F]">
+    <div className="h-screen w-full flex bg-c-secondary">
       <RoleGate allowedRoles={[UserRole.ADMIN, UserRole.MANAGER]}>
         {/* <Navigation /> */}
         <AppSidebar />

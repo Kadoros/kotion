@@ -46,6 +46,11 @@ export default defineSchema({
     createdAt: v.number(),
     progress: v.number(),
     language: v.string(),
+    last_review: v.optional(v.number()),
+    interval: v.optional(v.number()),
+    repetition: v.optional(v.number()),
+    ease: v.optional(v.float64()),
+
     userId: v.string(),
     wordListId: v.optional(v.id("wordLists")),
   })

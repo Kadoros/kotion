@@ -9,7 +9,7 @@ import {
   Check,
   Info,
 } from "lucide-react";
-import ProgressNavigation from "@/components/global/progress-navigation "; // Adjust the import path
+import ProgressNavigation from "@/components/global/progress-navigation"; // Adjust the import path
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -30,7 +30,7 @@ const WordMemorizingIntroduction = () => {
     try {
       const promise = create({ name: wordlistName, mode: wordlistType }).then(
         () => {
-          router.replace("/practice/words");
+          router.replace("/practice-hub/words");
         }
       );
 
